@@ -1,11 +1,13 @@
 package edu.url.salle.malou.lundstrom.recycklerview;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.CheckBox;
+
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,27 +34,19 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         crimes = new ArrayList<>();
-        crimes.add(new Crime("Theft", "Description of theft", true));
-        crimes.add(new Crime("Vandalism", "Description of vandalism", false));
-        crimes.add(new Crime("Assault", "Description of assault", true));
-        crimes.add(new Crime("Burglary", "Description of burglary", false));
-        crimes.add(new Crime("Fraud", "Description of fraud", true));
-        crimes.add(new Crime("Arson", "Description of arson", false));
-        crimes.add(new Crime("Robbery", "Description of robbery", true));
-        crimes.add(new Crime("Stalking", "Description of stalking", false));
-        crimes.add(new Crime("Harassment", "Description of harassment", true));
-        crimes.add(new Crime("Cybercrime", "Description of cybercrime", false));
+        crimes.add(new Crime("Theft", "Description of theft", true, true));
+        crimes.add(new Crime("Vandalism", "Description of vandalism", false, false));
+        crimes.add(new Crime("Assault", "Description of assault", true, true));
+        crimes.add(new Crime("Burglary", "Description of burglary", false, false));
+        crimes.add(new Crime("Fraud", "Description of fraud", true, true));
+        crimes.add(new Crime("Arson", "Description of arson", false, false));
+        crimes.add(new Crime("Robbery", "Description of robbery", true, true));
+        crimes.add(new Crime("Stalking", "Description of stalking", false, false));
+        crimes.add(new Crime("Harassment", "Description of harassment", true, true));
+        crimes.add(new Crime("Cybercrime", "Description of cybercrime", false, false));
 
         adapter = new CrimeAdapter(crimes);
         recyclerView.setAdapter(adapter);
-
-        printAllCrimes(crimes);
-    }
-
-    private void printAllCrimes(List<Crime> crimes) {
-        for (Crime crime : crimes) {
-            Log.d("Crime", "Title: " + crime.getTitle() + ", Description: " + crime.getDescription());
-        }
     }
 
     public class CrimeAdapter extends RecyclerView.Adapter<CrimeAdapter.CrimeHolder> {
@@ -82,20 +76,38 @@ public class MainActivity extends AppCompatActivity {
             return mCrimes.size();
         }
 
-        class CrimeHolder extends RecyclerView.ViewHolder {
+        class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
             private TextView mTitleTextView;
             private TextView mDescriptionTextView;
+            private CheckBox mSolvedCheckBox;
+            private Crime mCrime;
 
             public CrimeHolder(View itemView) {
                 super(itemView);
                 mTitleTextView = itemView.findViewById(R.id.text_view_crime_title);
                 mDescriptionTextView = itemView.findViewById(R.id.text_view_crime_description);
+                mSolvedCheckBox = itemView.findViewById(R.id.check_box_crime_solved);
+                itemView.setOnClickListener(this);
             }
 
             public void bind(Crime crime) {
+                mCrime = crime;
                 mTitleTextView.setText(crime.getTitle());
                 mDescriptionTextView.setText(crime.getDescription());
+                mSolvedCheckBox.setChecked(crime.isSolved());
+
+                // Change the background color based on whether the crime is critical
+                if (crime.isCritical()) {
+                    itemView.setBackgroundColor(itemView.getResources().getColor(android.R.color.holo_red_light));
+                } else {
+                    itemView.setBackgroundColor(itemView.getResources().getColor(android.R.color.holo_green_light));
+                }
+            }
+
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, mCrime.getTitle() + " clicked!", Toast.LENGTH_SHORT).show();
             }
         }
     }
